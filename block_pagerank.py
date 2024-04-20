@@ -12,14 +12,9 @@ LINK_MATRIX_PREFIX = ".\\data\\Link_Matrix_"
 LINK_MATRIX_SUFFIX = ".Matrix"
 R_VECTOR_PREDIX = ".\\data\\R_Vector_"
 R_VECTOR_SUFFIX = ".Vector"
-<<<<<<< HEAD
 RESULT_OUTPUT_PATH = ".\\block_result.txt"
 # R_read_SUFFIX = ".txt" # 可读版本
 R_read_SUFFIX = ".json" # 可读版本
-=======
-RESULT_OUTPUT_PATH = ".\\result(0.9).txt"
-R_read_SUFFIX = ".txt" # 可读版本
->>>>>>> 32f4252571a4013c15873d40e31dd761f126c7b7
 
 NEW_VECTOR_PREFIX = "_new"
 
