@@ -1,6 +1,5 @@
 """
-Author: Sakura, Michelle
-Date: 4/21/2021
+try collab
 """
 
 import pickle as pkl
