@@ -8,10 +8,11 @@ import numpy as np
 
 FMTO_GRAPH_PATH = ".\\Data.txt"
 LINK_MATRIX_PREFIX = ".\\data\\Link_Matrix_"
-LINK_MATRIX_SUFFIX = ".matrix"
+LINK_MATRIX_SUFFIX = ".Matrix"
 R_VECTOR_PREDIX = ".\\data\\R_Vector_"
-R_VECTOR_SUFFIX = ".vector"
+R_VECTOR_SUFFIX = ".Vector"
 RESULT_OUTPUT_PATH = ".\\result.txt"
+R_read_SUFFIX = ".txt" # 可读版本
 
 NEW_VECTOR_PREFIX = "_new"
 
@@ -45,20 +46,20 @@ class IndexTransfer:
     def dest2stripedest(self, dest):
         return dest % self.num_in_group
 
-    def stripedest2dest(self, sd, sno):
-        return sd + sno * self.num_in_group
-
-
 
 def dump_vector(transfer, block_index, r_, new=False):
     if block_index == BLOCK_NUM - 1:
         r_ = r_[:transfer.num_in_last_group]
     if new == False:
         f_name = R_VECTOR_PREDIX + str(block_index) + R_VECTOR_SUFFIX
+        f_name1 = R_VECTOR_PREDIX + str(block_index) + R_read_SUFFIX
     else:
         f_name = R_VECTOR_PREDIX + str(block_index) + NEW_VECTOR_PREFIX + R_VECTOR_SUFFIX
+        f_name1 = R_VECTOR_PREDIX + str(block_index) + NEW_VECTOR_PREFIX + R_read_SUFFIX
     with open(f_name, "wb") as wf:
         pkl.dump(r_, wf)
+    with open(f_name1, "w") as wf:
+        wf.write(str(r_))
     # for i in range(0, len(r_)):
     #     # print(block_index, ' ', i, '  ', block_index * 830 + i, ' ', new,' ',len(r_))
     #     R[block_index * 830 + i] = r_[i]
@@ -118,8 +119,12 @@ def load_data():
                 del Link_Matrix_List[fm]
         # 将给定的矩阵条带（stripe）以二进制写入模式打开一个文件，然后使用pickle模块将条带保存到该文件中
         f_name = LINK_MATRIX_PREFIX + str(i) + LINK_MATRIX_SUFFIX
+        f_name1 = LINK_MATRIX_PREFIX + str(i) + R_read_SUFFIX
         f = open(f_name, "wb")
         pkl.dump(Link_Matrix_List, f)
+
+        with open(f_name1, "w") as f:
+            f.write(str(Link_Matrix_List))
 
     return transfer
 
