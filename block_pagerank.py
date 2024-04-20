@@ -4,6 +4,7 @@ try collab
 
 import pickle as pkl
 import numpy as np
+import json
 
 
 FMTO_GRAPH_PATH = ".\\Data.txt"
@@ -11,8 +12,9 @@ LINK_MATRIX_PREFIX = ".\\data\\Link_Matrix_"
 LINK_MATRIX_SUFFIX = ".Matrix"
 R_VECTOR_PREDIX = ".\\data\\R_Vector_"
 R_VECTOR_SUFFIX = ".Vector"
-RESULT_OUTPUT_PATH = ".\\result(0.9).txt"
-R_read_SUFFIX = ".txt" # 可读版本
+RESULT_OUTPUT_PATH = ".\\block_result.txt"
+# R_read_SUFFIX = ".txt" # 可读版本
+R_read_SUFFIX = ".json" # 可读版本
 
 NEW_VECTOR_PREFIX = "_new"
 
@@ -27,23 +29,40 @@ THRESHOLD = 1e-8
 
 
 class IndexTransfer:
-    block_num = BLOCK_NUM
-    # max_node_index = 0
-    node_num = 0
-    num_in_group = 0
-    num_in_last_group = 0
-
     def __init__(self, node_num):
-        # self.block_num = block_num
-        # self.max_node_index = max_node_index
-        self.node_num = node_num
-        self.num_in_group = self.node_num // self.block_num + 1
-        self.num_in_last_group = node_num % self.num_in_group
+        """
+        初始化IndexTransfer类
+        
+        参数：
+        node_num (int): 图中节点的总数
+        """
+        self.node_num = node_num  # 节点总数
+        self.block_num = BLOCK_NUM  # 块的数量
+        self.num_in_group = node_num // self.block_num + 1  # 每个块中的节点数
+        self.num_in_last_group = node_num % self.num_in_group  # 最后一个块中的节点数（可能少于其他块）
 
     def calc_aim_block_index(self, aim):
+        """
+        计算给定节点的目标块索引
+        
+        参数：
+        aim (int): 节点索引
+        
+        返回值：
+        int: 目标块的索引
+        """
         return aim // self.num_in_group
 
     def dest2stripedest(self, dest):
+        """
+        将目标节点索引转换为其在块内的索引
+        
+        参数：
+        dest (int): 目标节点索引
+        
+        返回值：
+        int: 目标节点在块内的索引
+        """
         return dest % self.num_in_group
 
 
@@ -59,7 +78,8 @@ def dump_vector(transfer, block_index, r_, new=False):
     with open(f_name, "wb") as wf:
         pkl.dump(r_, wf)
     with open(f_name1, "w") as wf:
-        wf.write(str(r_))
+        # wf.write(str(r_))
+        json.dump(str(r_), wf)
     # for i in range(0, len(r_)):
     #     # print(block_index, ' ', i, '  ', block_index * 830 + i, ' ', new,' ',len(r_))
     #     R[block_index * 830 + i] = r_[i]
@@ -124,7 +144,8 @@ def load_data():
         pkl.dump(Link_Matrix_List, f)
 
         with open(f_name1, "w") as f:
-            f.write(str(Link_Matrix_List))
+            for link_matrix in Link_Matrix_List:
+                f.write(str(Link_Matrix_List[link_matrix])+"\n")
 
     return transfer
 
@@ -196,7 +217,7 @@ def output_result_list(transfer):
     print("start output")
     with open(RESULT_OUTPUT_PATH, "w") as f:
         for i, key in enumerate(results):
-            f.write("[%s]\t[%s]\n" % (str(key), str(results[key])))
+            f.write("%s %s\n" % (str(key), str(results[key])))
             if i == 99:
                 break
 
