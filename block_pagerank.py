@@ -11,14 +11,14 @@ LINK_MATRIX_PREFIX = ".\\data\\Link_Matrix_"
 LINK_MATRIX_SUFFIX = ".Matrix"
 R_VECTOR_PREDIX = ".\\data\\R_Vector_"
 R_VECTOR_SUFFIX = ".Vector"
-RESULT_OUTPUT_PATH = ".\\result.txt"
+RESULT_OUTPUT_PATH = ".\\result(0.9).txt"
 R_read_SUFFIX = ".txt" # 可读版本
 
 NEW_VECTOR_PREFIX = "_new"
 
 PRINT_NUM = 100
 SAVE_CHECKPOINT_INTERVAL = 10
-teleport_parameter = 0.15
+teleport_parameter = 0.9
 BLOCK_NUM = 10  # identify the num of block-stripes
 THRESHOLD = 1e-8
 
@@ -133,7 +133,7 @@ def normalize_list_randomwalk2(vector_sum, r_random, transfer):
     flag = 1
     for block_index in range(0, BLOCK_NUM):
         r_new = load_vector(block_index, True)
-        r_new = (1 - teleport_parameter) * (r_new + (1 - vector_sum) / transfer.node_num) + r_random[:len(r_new)]
+        r_new = teleport_parameter * (r_new + (1 - vector_sum) / transfer.node_num) + r_random[:len(r_new)]
         r_old = load_vector(block_index)
         if flag == 1:
             flag = (np.abs(r_new - r_old)).sum() < THRESHOLD * len(r_old) # 判断块的相似性
@@ -205,7 +205,7 @@ def block_stripe_pagerank(transfer):
     print("block stripe pangerank")
     initialize(transfer)
     r_random = np.ones(transfer.num_in_group) / \
-               transfer.node_num * teleport_parameter
+               transfer.node_num * (1 -teleport_parameter)
     print("initialize finish")
     flag = 0
     round = 0
