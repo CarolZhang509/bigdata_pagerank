@@ -210,7 +210,6 @@ def block_stripe_pagerank(transfer):
     flag = 0
     round = 0
     while not flag:  # 最后一组个数
-        # print(round, '\t', R[6634])
         vector_sum = matrix_multiple(transfer)  # 函数要实现收敛判断
         flag = normalize_list_randomwalk2(vector_sum, r_random, transfer)
         round += 1
