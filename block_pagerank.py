@@ -12,7 +12,7 @@ LINK_MATRIX_PREFIX = ".\\data\\Link_Matrix_"
 LINK_MATRIX_SUFFIX = ".Matrix"
 R_VECTOR_PREDIX = ".\\data\\R_Vector_"
 R_VECTOR_SUFFIX = ".Vector"
-RESULT_OUTPUT_PATH = ".\\block_result(0.85).txt"
+RESULT_OUTPUT_PATH = ".\\block_result(0.9).txt"
 # R_read_SUFFIX = ".txt" # 可读版本
 R_read_SUFFIX = ".json" # 可读版本
 
@@ -20,7 +20,7 @@ NEW_VECTOR_PREFIX = "_new"
 
 PRINT_NUM = 100
 SAVE_CHECKPOINT_INTERVAL = 10
-teleport_parameter = 0.85
+teleport_parameter = 0.9
 BLOCK_NUM = 10  # identify the num of block-stripes
 THRESHOLD = 1e-8
 
