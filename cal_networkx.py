@@ -6,7 +6,7 @@ import networkx as nx
 import os
 
 file_path = './Data.txt'
-teleport_parameter = 0.85
+teleport_parameter = 0.9
 tol = 1e-12
 
 def read_data(file_path):
@@ -35,7 +35,8 @@ def write_result(file_path, top_100_nodes):
     #     os.makedirs(os.path.dirname(file_path))
     with open(file_path, 'w') as file:
         for node, rank in top_100_nodes:
-            file.write(f'{node} {rank}\n')
+            #file.write(f'{node} {rank}\n')
+            file.write("[%s]\t[%s]\n" % (str(node), str(rank)))
 
 
 def main():
