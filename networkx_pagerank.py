@@ -6,13 +6,10 @@ import networkx as nx
 import os
 
 file_path = './Data.txt'
-teleport_parameter = 0.9
-tol = 1e-12
+teleport_parameter = 0.85
+tol = 1e-8
 
 def read_data(file_path):
-    """
-    读取数据，构建networkx图并返回。
-    """
     graph = nx.DiGraph()
     with open(file_path, 'r') as file:
         for line in file:
@@ -21,22 +18,18 @@ def read_data(file_path):
     return graph
 
 def top_nodes(pr, num_top_nodes = 100):
-    """
-    返回前100个具有最高PageRank值的节点及其PageRank值。
-    """
     sorted_nodes = sorted(pr.items(), key = lambda x:x[1], reverse = True)
     return sorted_nodes[:num_top_nodes]
 
-def write_result(file_path, top_100_nodes):
-    """
-    将结果写入文件。
-    """
-    # if not os.path.exists(file_path):
-    #     os.makedirs(os.path.dirname(file_path))
+def write_result(file_path, data):
+    directory = os.path.dirname(file_path)
+    # 如果目录不存在，则创建它
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    # 写入结果到文件
     with open(file_path, 'w') as file:
-        for node, rank in top_100_nodes:
-            #file.write(f'{node} {rank}\n')
-            file.write("[%s]\t[%s]\n" % (str(node), str(rank)))
+        for node, score in data:
+            file.write("{} {}\n".format(node, score))
 
 
 def main():
@@ -46,7 +39,7 @@ def main():
     print(f'Top 100 Nodes with their PageRank scores (teleport parameter = {teleport_parameter}):')
     # for node, rank in top_100_nodes:
     #     print(f'NodeID: {node}, PageRank: {rank}')
-    write_result('./networkx_result.txt', top_100_nodes)
+    write_result('.\\networkx_result_{}.txt'.format(teleport_parameter), top_100_nodes)
 
 if __name__ == '__main__':
     main()

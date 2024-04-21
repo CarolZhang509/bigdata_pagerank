@@ -12,7 +12,7 @@ LINK_MATRIX_PREFIX = ".\\data\\Link_Matrix_"
 LINK_MATRIX_SUFFIX = ".Matrix"
 R_VECTOR_PREDIX = ".\\data\\R_Vector_"
 R_VECTOR_SUFFIX = ".Vector"
-RESULT_OUTPUT_PATH = ".\\block_result(0.9).txt"
+# RESULT_OUTPUT_PATH = ".\\block_result(0.9).txt"
 # R_read_SUFFIX = ".txt" # 可读版本
 R_read_SUFFIX = ".json" # 可读版本
 
@@ -20,7 +20,7 @@ NEW_VECTOR_PREFIX = "_new"
 
 PRINT_NUM = 100
 SAVE_CHECKPOINT_INTERVAL = 10
-teleport_parameter = 0.9
+teleport_parameters = [0.75, 0.85, 0.9] 
 BLOCK_NUM = 10  # identify the num of block-stripes
 THRESHOLD = 1e-8
 
@@ -222,7 +222,7 @@ def output_result_list(transfer):
                 break
 
 
-def block_stripe_pagerank(transfer):
+def block_stripe_pagerank(transfer, teleport_parameter):
     print("block stripe pangerank")
     initialize(transfer)
     r_random = np.ones(transfer.num_in_group) / \
@@ -239,7 +239,9 @@ def block_stripe_pagerank(transfer):
 
 
 if __name__ == '__main__':
-    print("### Block-Stripe Version running.. ###")
-    transfer = load_data()
-    block_stripe_pagerank(transfer)
-    output_result_list(transfer)
+    for teleport_parameter in teleport_parameters:
+        RESULT_OUTPUT_PATH = ".\\block_result_{}.txt".format(teleport_parameter)
+        print('Block-Stripe Version running..', float(teleport_parameter))
+        transfer = load_data()
+        block_stripe_pagerank(transfer, teleport_parameter)
+        output_result_list(transfer)
