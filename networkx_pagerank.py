@@ -6,7 +6,7 @@ import networkx as nx
 import os
 
 file_path = './Data.txt'
-teleport_parameter = 0.85
+teleport_parameters = [0.75, 0.85, 0.9]
 tol = 1e-8
 
 def read_data(file_path):
@@ -33,13 +33,15 @@ def write_result(file_path, data):
 
 
 def main():
-    graph = read_data(file_path)
-    pr = nx.pagerank(graph, alpha=teleport_parameter, tol=tol)
-    top_100_nodes = top_nodes(pr)
-    print(f'Top 100 Nodes with their PageRank scores (teleport parameter = {teleport_parameter}):')
-    # for node, rank in top_100_nodes:
-    #     print(f'NodeID: {node}, PageRank: {rank}')
-    write_result('.\\networkx_result_{}.txt'.format(teleport_parameter), top_100_nodes)
+    for teleport_parameter in teleport_parameters:
+        graph = read_data(file_path)
+        pr = nx.pagerank(graph, alpha=teleport_parameter, tol=tol)
+        top_100_nodes = top_nodes(pr)
+        print(f'Teleport parameter = {teleport_parameter} running.')
+        # for node, rank in top_100_nodes:
+        #     print(f'NodeID: {node}, PageRank: {rank}')
+        write_result('.\\networkx_result\\networkx_result_{}.txt'.format(teleport_parameter), top_100_nodes)
+        print(f'Teleport parameter = {teleport_parameter} finished.')
 
 if __name__ == '__main__':
     main()

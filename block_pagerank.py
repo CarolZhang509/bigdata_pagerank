@@ -1,32 +1,15 @@
-"""
-try collab
-"""
-
 import pickle as pkl
 import numpy as np
 import json
+import os
 
-
-FMTO_GRAPH_PATH = ".\\Data.txt"
-LINK_MATRIX_PREFIX = ".\\data\\Link_Matrix_"
-LINK_MATRIX_SUFFIX = ".Matrix"
-R_VECTOR_PREDIX = ".\\data\\R_Vector_"
-R_VECTOR_SUFFIX = ".Vector"
-# RESULT_OUTPUT_PATH = ".\\block_result(0.9).txt"
-# R_read_SUFFIX = ".txt" # 可读版本
-R_read_SUFFIX = ".json" # 可读版本
-
-NEW_VECTOR_PREFIX = "_new"
 
 PRINT_NUM = 100
 SAVE_CHECKPOINT_INTERVAL = 10
-teleport_parameters = [0.75, 0.85, 0.9] 
 BLOCK_NUM = 10  # identify the num of block-stripes
 THRESHOLD = 1e-8
 
-# R = [0] * 8298
-# mindex = 0
-
+teleport_parameters = [0.75, 0.85, 0.9] 
 
 class IndexTransfer:
     def __init__(self, node_num):
@@ -44,24 +27,12 @@ class IndexTransfer:
     def calc_aim_block_index(self, aim):
         """
         计算给定节点的目标块索引
-        
-        参数：
-        aim (int): 节点索引
-        
-        返回值：
-        int: 目标块的索引
         """
         return aim // self.num_in_group
 
     def dest2stripedest(self, dest):
         """
         将目标节点索引转换为其在块内的索引
-        
-        参数：
-        dest (int): 目标节点索引
-        
-        返回值：
-        int: 目标节点在块内的索引
         """
         return dest % self.num_in_group
 
@@ -70,36 +41,30 @@ def dump_vector(transfer, block_index, r_, new=False):
     if block_index == BLOCK_NUM - 1:
         r_ = r_[:transfer.num_in_last_group]
     if new == False:
-        f_name = R_VECTOR_PREDIX + str(block_index) + R_VECTOR_SUFFIX
-        f_name1 = R_VECTOR_PREDIX + str(block_index) + R_read_SUFFIX
+        file_name = os.path.join(block_stripe_data_path, 'vector_{}.vector'.format(block_index))
+        file_name1 = os.path.join(block_stripe_data_path, 'vector_{}_read.json'.format(block_index))
     else:
-        f_name = R_VECTOR_PREDIX + str(block_index) + NEW_VECTOR_PREFIX + R_VECTOR_SUFFIX
-        f_name1 = R_VECTOR_PREDIX + str(block_index) + NEW_VECTOR_PREFIX + R_read_SUFFIX
-    with open(f_name, "wb") as wf:
+        file_name = os.path.join(block_stripe_data_path, 'vector_{}_new.vector'.format(block_index))
+        file_name1 = os.path.join(block_stripe_data_path, 'vector_{}_new.json'.format(block_index))
+    with open(file_name, "wb") as wf:
         pkl.dump(r_, wf)
-    with open(f_name1, "w") as wf:
-        # wf.write(str(r_))
+    with open(file_name1, "w") as wf:
         json.dump(str(r_), wf)
-    # for i in range(0, len(r_)):
-    #     # print(block_index, ' ', i, '  ', block_index * 830 + i, ' ', new,' ',len(r_))
-    #     R[block_index * 830 + i] = r_[i]
-
 
 def load_vector(block_index, new=False):
     if new == False:
-        f_name = R_VECTOR_PREDIX + str(block_index) + R_VECTOR_SUFFIX
-
+        file_name = os.path.join(block_stripe_data_path, 'vector_{}.vector'.format(block_index))
     else:
-        f_name = R_VECTOR_PREDIX + str(block_index) + NEW_VECTOR_PREFIX + R_VECTOR_SUFFIX
-    with open(f_name, "rb") as f:
+        file_name = os.path.join(block_stripe_data_path, 'vector_{}_new.vector'.format(block_index))
+    with open(file_name, "rb") as f:
         r = pkl.load(f)
 
     return r
 
 
 def load_matrix_stripe(index):
-    f_name = LINK_MATRIX_PREFIX + str(index) + LINK_MATRIX_SUFFIX
-    f = open(f_name, "rb")
+    file_name = os.path.join(block_stripe_data_path, 'link_matrix_{}.matrix'.format(index))
+    f = open(file_name, "rb")
     stripe = pkl.load(f)
     return stripe
 
@@ -107,7 +72,7 @@ def load_matrix_stripe(index):
 def read_graph(node_num):
     Link_Matrix = {}
 
-    with open(FMTO_GRAPH_PATH) as file:
+    with open(data_path) as file:
         for line in file:
             fm, to = map(int, line.split())
             node_num = max(node_num, fm, to)
@@ -126,7 +91,7 @@ def read_graph(node_num):
 def load_data():
     Node_Num = -1
     Link_Matrix, Node_Num = read_graph(Node_Num)
-    Node_Num += 1  # 默认有index=0的点
+    Node_Num += 1  
     transfer = IndexTransfer(Node_Num)
     #将处理后的矩阵条带存储起来
     for i in range(0, BLOCK_NUM):
@@ -138,8 +103,8 @@ def load_data():
             if len(Link_Matrix_List[fm][1]) == 0:
                 del Link_Matrix_List[fm]
         # 将给定的矩阵条带（stripe）以二进制写入模式打开一个文件，然后使用pickle模块将条带保存到该文件中
-        f_name = LINK_MATRIX_PREFIX + str(i) + LINK_MATRIX_SUFFIX
-        f_name1 = LINK_MATRIX_PREFIX + str(i) + R_read_SUFFIX
+        f_name = os.path.join(block_stripe_data_path, 'link_matrix_{}.matrix'.format(i))
+        f_name1 = os.path.join(block_stripe_data_path, 'link_matrix_{}.json'.format(i))
         f = open(f_name, "wb")
         pkl.dump(Link_Matrix_List, f)
 
@@ -215,7 +180,7 @@ def output_result_list(transfer):
         results.update(sort_result)
     results = dict(sorted(results.items(), key=lambda kv: (kv[1], kv[0]), reverse=True))
     print("start output")
-    with open(RESULT_OUTPUT_PATH, "w") as f:
+    with open(result_output_filename, "w") as f:
         for i, key in enumerate(results):
             f.write("[%s]\t[%s]\n" % (str(key), str(results[key])))
             if i == 99:
@@ -239,8 +204,15 @@ def block_stripe_pagerank(transfer, teleport_parameter):
 
 
 if __name__ == '__main__':
+    data_path = '.\\Data.txt'
+    block_stripe_data_path = '.\\block-stripe_data'
+    if not os.path.exists(block_stripe_data_path):
+        os.makedirs(block_stripe_data_path)
+    result_output_file_path = '.\\block-stripe_result'
+    if not os.path.exists(result_output_file_path):
+        os.makedirs(result_output_file_path)
     for teleport_parameter in teleport_parameters:
-        RESULT_OUTPUT_PATH = ".\\block_result_{}.txt".format(teleport_parameter)
+        result_output_filename = os.path.join(result_output_file_path, "block-stripe_result_{}.txt".format(teleport_parameter))
         print('Block-Stripe Version running..', float(teleport_parameter))
         transfer = load_data()
         block_stripe_pagerank(transfer, teleport_parameter)
